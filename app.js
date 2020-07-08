@@ -10,6 +10,140 @@ const outputPath = path.join(OUTPUT_DIR, "team.html");
 
 const render = require("./lib/htmlRenderer");
 
+var team = []
+
+inquirer
+const questions = [
+        {
+            type: 'list',
+            name: 'employeeType',
+            message: 'What is your role?',
+            choices: ['Manager','Engineer','Intern']
+        },
+        {
+            type: 'input',
+            name: 'name',
+            message: 'What is your name?',
+            validate: function(value) {
+                if (value != ''){
+                  return true;
+                };
+                return 'Please enter at least one character';
+              },
+        },
+        {
+            type: 'input',
+            name: 'id',
+            message: 'What is your ID number?',
+            validate: function(value) {
+                var valid = !isNaN(parseFloat(value));
+                return valid || 'Please enter a number';
+              },
+        },
+        {
+            type: 'input',
+            name: 'email',
+            message: 'Enter your email address',
+            validate: function(value) {
+                var pass = value.match(
+                /^([a-zA-Z0-9_\-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-zA-Z0-9\-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$/
+                );
+                if (pass) {
+                  return true;
+                }
+          
+                return 'Please enter a valid email address';
+              }
+        },
+        {
+            type: 'input',
+            name: 'officeNumber',
+            message: 'Enter your office number',
+            validate: function(value) {
+                var pass = value.match(
+                  /^([01]{1})?[-.\s]?\(?(\d{3})\)?[-.\s]?(\d{3})[-.\s]?(\d{4})\s?((?:#|ext\.?\s?|x\.?\s?){1}(?:\d+)?)?$/i
+                );
+                if (pass) {
+                  return true;
+                }
+          
+                return 'Please enter a valid 10 digit phone number';
+              },
+            when: (answers)=> {
+                if (answers.employeeType == 'Manager'){
+                    return true
+                }
+            }
+        },
+        {
+            type: 'input',
+            name: 'github',
+            message: 'Enter your GitHub account.',
+            when: (answers)=> {
+                if (answers.employeeType == 'Employee'){
+                    return true
+                }
+            },
+            validate: function(value) {
+                if (value != ''){
+                  return true;
+                };
+                return 'Please enter at least one character';
+              },
+        },
+        {
+            type: 'input',
+            name: 'school',
+            message: 'Enter your School.',
+            when: (answers)=> {
+                if (answers.employeeType == 'Intern'){
+                    return true
+                }
+            },
+            validate: function(value) {
+                if (value != ''){
+                  return true;
+                };
+                return 'Please enter at least one character';
+              },
+        },
+        {
+            type: 'confirm',
+            name: 'continue',
+            message: 'Would you like to enter another team member.',
+        }
+
+    ]
+function getData(){
+   inquirer.prompt(questions).then(answers=>{
+       
+        if (answers.employeeType == 'Manager'){
+            const manager = new Manager(answers.name, answers.id, answers.email,answers.officeNumber)
+            team.push(manager) 
+        } else if (answers.employeeType == 'Engineer'){
+            const employee = new Engineer(answers.name, answers.id, answers.email,answers.email)
+            team.push(employee)
+        } else if (answers.employeeType == 'Intern'){
+            const intern = new Intern(answers.name, answers.id, answers.email,answers.school)
+            team.push(intern)
+        }
+        if (answers.continue){
+            getData()
+        } else {
+            writeTeam()
+        }
+    })
+
+    .catch(error => {
+        if(error){
+            console.log(error)
+        }
+    })
+}
+getData()
+function writeTeam(){
+    fs.writeFileSync(outputPath,render(team),'utf-8')   
+}
 
 // Write code to use inquirer to gather information about the development team members,
 // and to create objects for each team member (using the correct classes as blueprints!)
