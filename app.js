@@ -80,7 +80,7 @@ const questions = [
             name: 'github',
             message: 'Enter your GitHub account.',
             when: (answers)=> {
-                if (answers.employeeType == 'Employee'){
+                if (answers.employeeType == 'Engineer'){
                     return true
                 }
             },
@@ -121,7 +121,7 @@ function getData(){
             const manager = new Manager(answers.name, answers.id, answers.email,answers.officeNumber)
             team.push(manager) 
         } else if (answers.employeeType == 'Engineer'){
-            const employee = new Engineer(answers.name, answers.id, answers.email,answers.email)
+            const employee = new Engineer(answers.name, answers.id, answers.email,answers.github)
             team.push(employee)
         } else if (answers.employeeType == 'Intern'){
             const intern = new Intern(answers.name, answers.id, answers.email,answers.school)
